@@ -19,6 +19,10 @@ func init() {
 			"arg_one": "one",
 			"arg_two": "two",
 		},
+		ExtraArgsArray: map[string][]string{
+			"arg1": {"v1"},
+			"arg2": {"v2"},
+		},
 		ExtraBinds:            []string{"bind_one", "bind_two"},
 		ExtraEnv:              []string{"env_one", "env_two"},
 		Image:                 "image",
@@ -30,6 +34,20 @@ func init() {
 			"extra_args": map[string]interface{}{
 				"arg_one": "one",
 				"arg_two": "two",
+			},
+			"extra_args_array": []interface{}{
+				map[string]interface{}{
+					"extra_arg": []interface{}{
+						map[string]interface{}{
+							"argument": "arg1",
+							"values":   []interface{}{"v1"},
+						},
+						map[string]interface{}{
+							"argument": "arg2",
+							"values":   []interface{}{"v2"},
+						},
+					},
+				},
 			},
 			"extra_binds":              []interface{}{"bind_one", "bind_two"},
 			"extra_env":                []interface{}{"env_one", "env_two"},

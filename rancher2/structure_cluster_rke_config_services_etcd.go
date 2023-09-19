@@ -123,6 +123,10 @@ func flattenClusterRKEConfigServicesEtcd(in *managementClient.ETCDService, p []i
 		obj["extra_args"] = toMapInterface(in.ExtraArgs)
 	}
 
+	if len(in.ExtraArgsArray) > 0 {
+		obj["extra_args_array"] = flattenExtraArgsArray(in.ExtraArgsArray)
+	}
+
 	if len(in.ExtraBinds) > 0 {
 		obj["extra_binds"] = toArrayInterface(in.ExtraBinds)
 	}
@@ -275,6 +279,10 @@ func expandClusterRKEConfigServicesEtcd(p []interface{}) (*managementClient.ETCD
 
 	if v, ok := in["extra_args"].(map[string]interface{}); ok && len(v) > 0 {
 		obj.ExtraArgs = toMapString(v)
+	}
+
+	if v, ok := in["extra_args_array"].([]interface{}); ok && len(v) > 0 {
+		obj.ExtraArgsArray = expandExtraArgsArray(v)
 	}
 
 	if v, ok := in["extra_binds"].([]interface{}); ok && len(v) > 0 {

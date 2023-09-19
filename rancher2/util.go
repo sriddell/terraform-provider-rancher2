@@ -530,12 +530,68 @@ func toMapString(in map[string]interface{}) map[string]string {
 	return out
 }
 
+func expandExtraArgsArray(v []interface{}) map[string][]string {
+	extraArgMap := make(map[string][]string)
+	if v == nil || len(v) == 0 || v[0] == nil {
+		return extraArgMap
+	}
+
+	// there should only be 1 extra_args_array block per service
+	extraArgs := v[0].(map[string]interface{})["extra_arg"]
+	for _, extraArg := range extraArgs.([]interface{}) {
+		arg := extraArg.(map[string]interface{})
+		interfaceValues := arg["values"].([]interface{})
+		stringValues := make([]string, 0, len(interfaceValues))
+		for _, e := range interfaceValues {
+			stringValues = append(stringValues, e.(string))
+		}
+		extraArgMap[arg["argument"].(string)] = stringValues
+	}
+
+	return extraArgMap
+}
+
 func toMapInterface(in map[string]string) map[string]interface{} {
 	out := make(map[string]interface{})
 	for i, v := range in {
 		out[i] = v
 	}
 	return out
+}
+
+func flattenExtraArgsArray(in map[string][]string) []interface{} {
+	// ensure deterministic ordering of map
+	// to prevent flaky unit-tests. Alphabetical
+	// ordering must be honored in .tf files to ensure
+	// the planner does not detect changes when there are none.
+	// This is required as ExtraArgsArray is of type map[string][]string
+	// and there is no way to guarantee element order when flattening the map.
+	var keys []string
+	for k := range in {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+
+	var extraArgs []interface{}
+	for _, k := range keys {
+		var arr []interface{}
+		for _, e := range in[k] {
+			arr = append(arr, e)
+		}
+		sort.Slice(arr, func(i, j int) bool { return arr[i].(string) < arr[j].(string) })
+		extraArgs = append(extraArgs, map[string]interface{}{
+			"argument": k,
+			"values":   arr,
+		})
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"extra_arg": extraArgs,
+		},
+	}
 }
 
 func jsonToMapInterface(in string) (map[string]interface{}, error) {
