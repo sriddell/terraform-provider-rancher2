@@ -19,9 +19,10 @@ fi
 
 BUILDER_TAG=${BUILDER_TAG:-"terraform-provider-rancher2_builder"}
 
-${DOCKER_BIN} build -t ${BUILDER_TAG} -f $(dirname $0)/Dockerfile.builder .
+${DOCKER_BIN} build -t ${BUILDER_TAG} -f $(dirname $0)/Dockerfile.builder --progress=plain .
 
 ${DOCKER_BIN} run -i --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $PWD:/go/src/github.com/terraform-providers/terraform-provider-rancher2 \
+  -e CROSS \
   ${BUILDER_TAG} make build-rancher
