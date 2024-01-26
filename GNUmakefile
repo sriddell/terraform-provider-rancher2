@@ -9,7 +9,7 @@ build: validate
 	@sh -c "'$(CURDIR)/scripts/gobuild.sh'"
 
 docker-build: 
-	@sh -c "'$(CURDIR)/scripts/gobuild_docker.sh'"
+	@sh -c "'CROSS=1 $(CURDIR)/scripts/gobuild_docker.sh'"
 
 build-rancher: validate-rancher
 	@sh -c "'$(CURDIR)/scripts/gobuild.sh'"
